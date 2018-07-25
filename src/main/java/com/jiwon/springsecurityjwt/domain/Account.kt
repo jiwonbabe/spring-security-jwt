@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "ACCOUNT")
-internal data class Account(
+data class Account(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         private val id: Long? = null,
@@ -13,20 +13,18 @@ internal data class Account(
         val username: String? = null,
 
         @Column(name = "ACCOUNT_USERID")
-        private val userId: String? = null,
+        val userId: String? = "jiwon",
 
         @Column(name = "ACCOUNT_PASSWORD")
-        val password: String? = null,
+        var password: String? = "1234",
 
         @Column(name = "ACCOUNT_ROLE")
         @Enumerated(value = EnumType.STRING)
-        val userRole: UserRole? = null,
+        var userRole: UserRole? = UserRole.USER,
 
         @Column(name = "ACCOUNT_SOCIAL_ID")
-        private val socialId: Long? = null,
+        val socialId: Long? = null,
 
         @Column(name = "ACCOUNT_SOCIAL_PROFILEPIC")
-        private val profileHref: String? = null
-) {
-
-        }
+        val profileHref: String? = null
+)
