@@ -1,9 +1,14 @@
 package com.jiwon.springsecurityjwt.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jiwon.springsecurityjwt.security.filter.FilterSkipMatcher;
 import com.jiwon.springsecurityjwt.security.filter.FormLoginFilter;
+import com.jiwon.springsecurityjwt.security.filter.JwtAuthenticationFilter;
 import com.jiwon.springsecurityjwt.security.handlers.FormLoginAuthenticationSuccessHandler;
+import com.jiwon.springsecurityjwt.security.handlers.JwtAuthenticationFailureHandler;
+import com.jiwon.springsecurityjwt.security.jwt.HeaderTokenExtractor;
 import com.jiwon.springsecurityjwt.security.providers.FormLoginAuthenticationProvider;
+import com.jiwon.springsecurityjwt.security.providers.JwtAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +26,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -31,6 +38,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private FormLoginAuthenticationProvider provider;
+
+    @Autowired
+    private JwtAuthenticationProvider jwtProvider;
+
+    @Autowired
+    private JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler;
+
+    @Autowired
+    private HeaderTokenExtractor extractor;
 
     @Bean
     public PasswordEncoder getPasswordEncoder(){
@@ -55,10 +71,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return formLoginFilter;
     }
 
+    private JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
+        FilterSkipMatcher matcher = new FilterSkipMatcher(Arrays.asList("/formlogin"), "/api/**");
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(matcher, jwtAuthenticationFailureHandler, extractor);
+        filter.setAuthenticationManager(super.authenticationManagerBean());
+
+        return filter;
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .authenticationProvider(this.provider);
+                .authenticationProvider(this.provider)
+                .authenticationProvider(this.jwtProvider);
     }
 
     @Override
@@ -75,6 +100,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers().frameOptions().disable();
         // 필터 등록
         http
-                .addFilterBefore(formLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(formLoginFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

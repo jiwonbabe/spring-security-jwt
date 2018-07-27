@@ -1,14 +1,13 @@
-package com.jiwon.springsecurityjwt.security;
+package com.jiwon.springsecurityjwt.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.jiwon.springsecurityjwt.security.AccountContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 @Component
 public class JwtFactory {
@@ -22,6 +21,7 @@ public class JwtFactory {
         try{
             token = JWT.create()
                     .withIssuer("jiwon")
+                    .withClaim("USERNAME", context.getAccount().getUserId())
                     .withClaim("USER_ROLE", context.getAccount().getUserRole().getRoleName())
                     .sign(getAlgorithm());
         } catch (UnsupportedEncodingException e) {

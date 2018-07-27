@@ -1,10 +1,9 @@
 package com.jiwon.springsecurityjwt.security.handlers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jiwon.springsecurityjwt.dtos.TokenDto;
 import com.jiwon.springsecurityjwt.security.AccountContext;
-import com.jiwon.springsecurityjwt.security.JwtFactory;
+import com.jiwon.springsecurityjwt.security.jwt.JwtFactory;
 import com.jiwon.springsecurityjwt.security.tokens.PostAuthorizationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
